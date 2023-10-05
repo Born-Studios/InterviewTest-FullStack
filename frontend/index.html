@@ -1,19 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
-<meta charset="UTF-8">
-<title>Born Coding Challenge</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Born Coding Challenge</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>City Current Temperature</title>
 <style>
+*{
+padding: 0;
+margin: 0;
+font-family: "Quicksand", sans-serif;
+}
+
+body{
+background: #f3f2ef;
+display: flex;
+justify-content: center;
+flex-wrap: wrap;
+height: 100vh;
+width:100vw;
+}
+
+html,
+body{	
+font-size: 52.5%;
+height: 100%;
+}
+
+html{
+background : #eee;
+}
+
+.box{
+width: 20vw;
+height: 40vh;
+border-radius: 0.5rem;
+box-shadow: 0 0.2rem 3rem rgba(0, 0, 0, 0.2);
+background: #a5bbdd;
+position: relative;
+overflow: hidden;
+transform: translate3d(0, 0, 0);
+min-width: 20rem;
+min-height: 35rem;
+font-size: medium;
+text-align: center;
+margin-top: 100px;
+padding-top: 150px;
+border-radius: 10px;
+}
+.button{
+color: red;
+border-radius: .5px;
+border-color: aqua;
+background-color: #23ebd3;
+
+}
+
+
 </style>
-<script src=""></script>
 
-<body>
 
-    <div class="">
-        <h1>Current Temperature</h1>
+  </head>
+  <body>
+    <div class="box">
+      <h3>Current Temperature</h3>
+         <form action="/getTemperature" method="GET">
+        <label for="city">Select city in UK</label>
+        <!-- <input type="text" id="city" name="city" required /> -->
+        <br><br>
+        <select id="selectCity"></select>
+        <button class="button" type="submit" id="submit">Search</button>
+      </form>
+      <br>
+      <p id="temperature"></p>
     </div>
+    
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
 
-</body>
+    
 
+    <script>
+      $(document).ready(function () {
+        console.log("ready!");
+
+        $.get(baseUrl + "getcities", function (json, status) {
+          var select = $("#selectCity");
+
+          $.each(json, function (index, json) {
+            select.append(
+              $("<option></option>")
+                .attr("value", json.lat + "," + json.lng)
+                .text(json.city)
+            );
+          });
+
+          $("#divSelect").html(select);
+        });
+      });
+
+      const submitBtn = document.getElementById("submit");
+
+      const baseUrl = "http://localhost:3000/";
+
+      submitBtn.addEventListener("click", getInfo);
+      async function getInfo(e) {
+        e.preventDefault();
+
+        var selectedValue = $("#selectCity").find(":selected").val();
+        var arr = selectedValue.split(",");
+        if (arr.length != 2) return;
+
+        var lat = arr[0];
+        var lng = arr[1];
+
+        $("#temperature").html("");
+
+        $.get(
+          baseUrl + "getTemperature?lat=" + lat + "&lng=" + lng,
+          function (json, status) {
+            var data = JSON.parse(json);
+            $("#temperature").html(
+              "<h2> Temperature is " + data.hourly.temperature_2m[0] + "</h2>"
+            );
+          }
+        );
+      }
+      
+      async function postInfo() {}
+    </script>
+    
+  </body>
 </html>
